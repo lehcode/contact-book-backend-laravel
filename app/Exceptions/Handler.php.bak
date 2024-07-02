@@ -1,0 +1,42 @@
+<?php
+
+namespace App\Exceptions;
+
+use Illuminate\Http\JsonResponse;
+use Throwable;
+use Illuminate\Foundation\Exceptions\Handler as ExceptionHandler;
+use Symfony\Component\HttpFoundation\Response;
+
+class Handler extends ExceptionHandler
+{
+    public function render($request, Throwable $exception)
+{
+    if ($request->expectsJson()) {
+        if ($exception instanceof ModelNotFoundException) {
+            return response()->json([
+                'error' => 'Resource not found'
+            ], 404);
+        }
+
+        if ($exception instanceof AuthorizationException) {
+            return response()->json([
+                'error' => 'Unauthorized'
+            ], 403);
+        }
+
+        if ($exception instanceof ValidationException) {
+            return response()->json([
+                'error' => 'Validation failed',
+                'errors' => $exception->errors()
+            ], 422);
+        }
+
+        return response()->json([
+            'error' => $exception->getMessage()
+        ], $this->isHttpException($exception) ? $exception->getStatusCode() : 500);
+    }
+
+    return parent::render($request, $exception);
+}
+
+}

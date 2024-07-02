@@ -8,4 +8,7 @@ Route::get('/user', function (Request $request) {
     return $request->user();
 })->middleware('auth:sanctum');
 
-Route::apiResource('/contacts', ContactController::class);
+Route::middleware('api')->group(function () {
+    Route::apiResource('/contacts', ContactController::class);
+});
+

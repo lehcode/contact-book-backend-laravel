@@ -4,18 +4,35 @@ namespace App\Services;
 
 use App\Repositories\ContactRepository;
 use App\Models\Contact;
+use Faker\Factory;
 
 class ContactService
 {
     protected $contactRepository;
+    protected $faker;
 
     public function __construct(ContactRepository $contactRepository)
     {
         $this->contactRepository = $contactRepository;
+        if (env('APP_ENV') === 'development') {
+            $this->faker = Factory::create();
+        }
     }
 
     public function createContact(array $data)
     {
+        if (env('APP_ENV') === 'development') {
+            $contact = new Contact([
+                "first_name" => $this->faker->first_name,
+                "last_name" => $this->faker->last_name,
+                "phones" => []
+            ]);
+
+            print_r($contact);
+
+            return $contact;
+        }
+
         return $this->contactRepository->create($data);
     }
 
@@ -31,6 +48,19 @@ class ContactService
 
     public function getAllContacts()
     {
+        if (env('APP_ENV') === 'local') {
+            $contacts = [];
+            for ($i = 0; $i < 10; $i++) {
+                $contact = new Contact([
+                    "first_name" => $this->faker->firstName,
+                    "last_name" => $this->faker->lastName,
+                    "phones" => []
+                ]);
+                $contacts[] = $contact;
+            }
+            return $contacts;
+        }
+
         return $this->contactRepository->getAll();
     }
 }
