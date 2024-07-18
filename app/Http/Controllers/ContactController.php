@@ -5,7 +5,6 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use App\Models\Contact;
 use App\Services\ContactService;
-use Faker\Factory;
 
 
 class ContactController extends Controller
@@ -22,19 +21,6 @@ class ContactController extends Controller
      */
     public function index()
     {
-        if (env('APP_ENV') === 'development') {
-            $contacts = [];
-            for ($i = 0; $i < 10; $i++) {
-                $contact = new Contact([
-                    "first_name" => $this->faker->firstName,
-                    "last_name" => $this->faker->lastName,
-                    "phones" => []
-                ]);
-                $contacts[] = $contact;
-            }
-            return $contacts;
-        }
-
         return response()->json($this->contactService->getAllContacts());
     }
 

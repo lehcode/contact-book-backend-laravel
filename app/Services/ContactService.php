@@ -14,14 +14,14 @@ class ContactService
     public function __construct(ContactRepository $contactRepository)
     {
         $this->contactRepository = $contactRepository;
-        if (env('APP_ENV') === 'development') {
+        if (env('MOCK_DATA') === 'yes') {
             $this->faker = Factory::create();
         }
     }
 
     public function createContact(array $data)
     {
-        if (env('APP_ENV') === 'development') {
+        if (env('MOCK_DATA') === 'yes') {
             $contact = new Contact([
                 "first_name" => $this->faker->first_name,
                 "last_name" => $this->faker->last_name,
@@ -31,9 +31,9 @@ class ContactService
             print_r($contact);
 
             return $contact;
+        } else {
+            return $this->contactRepository->create($data);
         }
-
-        return $this->contactRepository->create($data);
     }
 
     public function updateContact(Contact $contact, array $data)
@@ -48,7 +48,7 @@ class ContactService
 
     public function getAllContacts()
     {
-        if (env('APP_ENV') === 'local') {
+        if (env('MOCK_DATA') === 'yes') {
             $contacts = [];
             for ($i = 0; $i < 10; $i++) {
                 $contact = new Contact([
